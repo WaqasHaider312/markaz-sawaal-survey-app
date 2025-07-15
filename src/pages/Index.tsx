@@ -14,7 +14,267 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [surveyData, setSurveyData] = useState<SurveyData>({});
 
-  // Define all pages first
+  const handleAnswer = (questionId: string, answer: string) => {
+    setSurveyData(prev => ({ ...prev, [questionId]: answer }));
+    
+    // Handle conditional logic
+    const nextPage = getNextPage(questionId, answer);
+    setTimeout(() => setCurrentPage(nextPage), 300);
+  };
+
+  const handleTextAnswer = (questionId: string, value: string) => {
+    setSurveyData(prev => ({ ...prev, [questionId]: value }));
+  };
+
+  const getNextPage = (questionId: string, answer: string): number => {
+    const currentPageIndex = pages.findIndex(p => p.id === questionId);
+    
+    // Conditional logic mapping
+    const conditionalRoutes: { [key: string]: { [key: string]: string } } = {
+      'q1': {
+        '🤔 Thoda mushkil': 'q1a',
+        '😕 Samajh nahi aata kya karna hota hai': 'q1a'
+      },
+      'q2': {
+        '❌ Nahi hota hai': 'q2a',
+        '📞 Bar bar contact karna parta hai': 'q2a'
+      },
+      'q2a': {
+        '📦 Order ki delivery kay issues': 'q2a1',
+        '🔄 Status update kay issues': 'q2a2',
+        '💸 Return / Refunds kay issues': 'q2a3',
+        '💰 Profit / Bonus kay issues': 'q2a4'
+      },
+      'q3': {
+        '🙂 Theek hai, lekin aur behtar ho sakta hai': 'q3b',
+        '😐 Rude ya uninterested lagta hai': 'q3a'
+      },
+      'q4': {
+        '🔁 Automatic reattempt request form': 'q4a',
+        '❌ Order cancellation form': 'q4b',
+        '🇨🇳 China parcels ka form': 'q4c'
+      }
+    };
+
+    if (conditionalRoutes[questionId] && conditionalRoutes[questionId][answer]) {
+      const targetPageId = conditionalRoutes[questionId][answer];
+      const targetPageIndex = pages.findIndex(p => p.id === targetPageId);
+      return targetPageIndex;
+    }
+
+    // Default: go to next page
+    return currentPageIndex + 1;
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < pages.length - 1) {
+      setCurrentPage(currentPage + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  // Replace the old handleSubmit with the new async version
+  const handleSubmit = async () => {
+    console.log('Survey Data:', surveyData);
+
+    // Prepare payload to match your Google Sheet columns
+    const payload = {
+      timestamp: new Date().toISOString(),
+      resellerId: surveyData['resellerId'] || '',
+      q1: surveyData['q1'] || '',
+      q1a: surveyData['q1a'] || '',
+      q2: surveyData['q2'] || '',
+      q2a: surveyData['q2a'] || '',
+      q2aX: surveyData['q2a1'] || surveyData['q2a2'] || surveyData['q2a3'] || surveyData['q2a4'] || '',
+      q3: surveyData['q3'] || '',
+      q3ab: surveyData['q3a'] || surveyData['q3b'] || '',
+      q4: surveyData['q4'] || '',
+      q4abc: surveyData['q4a'] || surveyData['q4b'] || surveyData['q4c'] || '',
+      good1: surveyData['q5_0'] || '',
+      good2: surveyData['q5_1'] || '',
+      good3: surveyData['q5_2'] || '',
+      bad1: surveyData['q5_3'] || '',
+      bad2: surveyData['q5_4'] || '',
+      bad3: surveyData['q5_5'] || ''
+    };
+
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycby8KytAlTHdmHkCxbF-96piMleodvinERMk3RRuukPxWd_fwwV3zNP7ex7bKO0r3LKUcg/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      console.log("✅ Google Sheet response:", result);
+
+      toast({
+        title: "🎉 Shukriya!",
+        description: "Aapka feedback successfully submit ho gaya hai.",
+      });
+
+      setCurrentPage(pages.length); // Show thank you page
+
+    } catch (error) {
+      console.error("❌ Error saving to Sheet:", error);
+      toast({
+        title: "⚠️ Error",
+        description: "Feedback submit nahi ho paaya. Dobara try karein.",
+      });
+    }
+  };
+
+  const WelcomePage = () => (
+    <div className="text-center animate-fade-in">
+      <div className="text-6xl mb-6">👋</div>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Assalamualaikum Reseller Family!
+      </h1>
+      <div className="text-lg text-gray-600 mb-8 leading-relaxed space-y-4">
+        <p className="text-markaz-green font-medium">
+          Aapka feedback humare liye bohat important hai 💚
+        </p>
+        <p>
+          Yeh chota sa survey sirf 1–2 minute ka hai jisme aap apna asal experience batayein — na zyada tareef, na zyada shikayat — bas jo <strong>real</strong> mehsoos hua wohi likhein ✍️
+        </p>
+        <p>
+          Aapki baat directly support team tak pohchayi jaayegi taake hum behtar ban saken ✅
+        </p>
+        <p className="font-medium">
+          Shuru karte hain? 👇
+        </p>
+      </div>
+      <Button 
+        onClick={() => setCurrentPage(1)}
+        className="bg-markaz-green hover:bg-markaz-green/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+      >
+        Start Survey
+      </Button>
+    </div>
+  );
+
+  const MultipleChoiceQuestion = ({ page }: { page: any }) => (
+    <div className="animate-fade-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+        {page.question}
+      </h2>
+      <div className="space-y-4">
+        {page.options.map((option: string, index: number) => (
+          <Button
+            key={index}
+            variant="outline"
+            className="w-full h-16 p-4 text-left text-base leading-tight rounded-2xl border-2 hover:border-markaz-green hover:bg-markaz-light transition-all duration-200 justify-start items-center flex"
+            onClick={() => handleAnswer(page.id, option)}
+          >
+            <span className="truncate">{option}</span>
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const TextInputQuestion = ({ page }: { page: any }) => (
+    <div className="animate-fade-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+        {page.question}
+      </h2>
+      <div className="space-y-6">
+        <Textarea
+          placeholder="Aapka jawab yahan likhein..."
+          className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-markaz-green resize-none"
+          value={surveyData[page.id] || ''}
+          onChange={(e) => {
+            const words = e.target.value.split(' ').filter(word => word.length > 0);
+            if (words.length <= (page.maxWords || 50)) {
+              handleTextAnswer(page.id, e.target.value);
+            }
+          }}
+        />
+        <p className="text-sm text-gray-500 text-center">
+          {page.maxWords && `Maximum ${page.maxWords} words`}
+        </p>
+        <Button 
+          onClick={goToNextPage}
+          className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          disabled={!surveyData[page.id]?.trim()}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+
+  const GroupQuestion = ({ page }: { page: any }) => (
+    <div className="animate-fade-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+        {page.question}
+      </h2>
+      <div className="space-y-6">
+        {page.fields.map((field: any, index: number) => (
+          <div key={index} className="space-y-2">
+            <label className="text-lg font-medium text-gray-700">
+              {index < 3 ? field.label : field.label.replace('Behtar cheez', 'Is cheez main behtari ki zarurat hai')}
+            </label>
+            <Input
+              placeholder="Yahan likhein..."
+              className="text-lg p-4 rounded-2xl border-2 focus:border-markaz-green"
+              value={surveyData[`${page.id}_${index}`] || ''}
+              onChange={(e) => {
+                const words = e.target.value.split(' ').filter(word => word.length > 0);
+                if (words.length <= (field.maxWords || 10)) {
+                  handleTextAnswer(`${page.id}_${index}`, e.target.value);
+                }
+              }}
+            />
+            <p className="text-sm text-gray-500">
+              Maximum {field.maxWords || 10} words
+            </p>
+          </div>
+        ))}
+        <Button 
+          onClick={goToNextPage}
+          className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          disabled={!page.fields.every((_: any, index: number) => surveyData[`${page.id}_${index}`]?.trim())}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+
+  const ThankYouPage = () => (
+    <div className="text-center animate-fade-in">
+      <div className="text-6xl mb-6">🎉</div>
+      <h1 className="text-3xl font-bold text-markaz-green mb-6">
+        Shukriya!
+      </h1>
+      <div className="text-lg text-gray-600 mb-8 leading-relaxed space-y-4">
+        <p className="text-markaz-green font-medium">
+          Aapka feedback humare liye bohat valuable hai 💚
+        </p>
+        <p>
+          Aapki baat support aur product team tak pohchayi jaayegi — taake Markaz ko aur behtar banaya jaa sake.
+        </p>
+        <p className="font-medium">
+          Aap ki participation ka shukriya, is process se aap future main mazeed improvements dekhien ge💪
+        </p>
+      </div>
+      <Button 
+        onClick={() => {
+          setCurrentPage(0);
+          setSurveyData({});
+        }}
+        className="bg-markaz-green hover:bg-markaz-green/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+      >
+        Submit & Close
+      </Button>
+    </div>
+  );
+
+  // Define all pages
   const pages = [
     { id: 'welcome', type: 'welcome' },
     {
