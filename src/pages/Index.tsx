@@ -100,7 +100,7 @@ const Index = () => {
     };
 
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycby8KytAlTHdmHkCxbF-96piMleodvinERMk3RRuukPxWd_fwwV3zNP7ex7bKO0r3LKUcg/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbzeqm-BD9rXOi2JC9rkBjwVYO43yeoEyh-wvWmpFsFLGU39CrTiHZv0sKK6GMzz0_Ai/exec", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -255,33 +255,14 @@ const Index = () => {
   );
 
   const ThankYouPage = () => (
-    <div className="text-center animate-fade-in">
-      <div className="text-6xl mb-6">🎉</div>
-      <h1 className="text-3xl font-bold text-markaz-green mb-6">
-        Shukriya!
-      </h1>
-      <div className="text-lg text-gray-600 mb-8 leading-relaxed space-y-4">
-        <p className="text-markaz-green font-medium">
-          Aapka feedback humare liye bohat valuable hai 💚
-        </p>
-        <p>
-          Aapki baat support aur product team tak pohchayi jaayegi — taake Markaz ko aur behtar banaya jaa sake.
-        </p>
-        <p className="font-medium">
-          Aap ki participation ka shukriya, is process se aap future main mazeed improvements dekhien ge💪
-        </p>
-      </div>
-      <Button 
-        onClick={() => {
-          setCurrentPage(0);
-          setSurveyData({});
-        }}
-        className="bg-markaz-green hover:bg-markaz-green/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-      >
-        Submit & Close
-      </Button>
-    </div>
-  );
+  <div className="text-center animate-fade-in">
+    <div className="text-6xl mb-6">🎉</div>
+    <h2 className="text-2xl font-bold mb-4">Shukriya!</h2>
+    <p className="text-lg text-gray-600">Aapka survey submit ho gaya hai.</p>
+  </div>
+);
+
+
 
   // Define all pages
   const pages = [
