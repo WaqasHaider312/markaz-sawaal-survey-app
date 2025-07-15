@@ -182,6 +182,26 @@ const Index = () => {
         {page.question}
       </h2>
       <div className="space-y-6">
+        <Textarea
+         placeholder="Aapka jawab yahan likhein..."
+         className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-markaz-green resize-none"
+         value={surveyData[page.id] || ''}
+          onChange={(e) => {
+          const text = e.target.value;
+          const wordLimit = page.maxWords || 10;
+          const wordCount = text.trim().split(/\s+/).length;
+
+        if (wordCount <= wordLimit) {
+          handleTextAnswer(page.id, text);
+          } else {
+          toast({
+          title: "Maximum words exceeded",
+          description: `Sirf ${wordLimit} alfaaz likhein.`,
+    });
+    }
+  }}
+/>
+
         <p className="text-sm text-gray-500 text-center">
           {page.maxWords && `Maximum ${page.maxWords} words`}
         </p>
@@ -455,6 +475,7 @@ const Index = () => {
     },
     { id: 'thankyou', type: 'thankyou' }
   ];
+
 
   const renderCurrentPage = () => {
     if (currentPage === 0) return <WelcomePage />;
