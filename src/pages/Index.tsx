@@ -14,6 +14,199 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [surveyData, setSurveyData] = useState<SurveyData>({});
 
+  // Define all pages first
+  const pages = [
+    { id: 'welcome', type: 'welcome' },
+    {
+      id: 'q1',
+      type: 'multiple-choice',
+      question: 'Support team se baat karna aapko kaisa lagta?',
+      options: [
+        '✅ Asaan',
+        '🙂 Theek tha',
+        '🤔 Thoda mushkil',
+        '😕 Samajh nahi aata kya karna hota hai'
+      ]
+    },
+    {
+      id: 'q1a',
+      type: 'multiple-choice',
+      question: 'Aapko kis cheez me sabse zyada mushkil hui?',
+      options: [
+        '🤖 Bot ka jawab sahi nahi hota',
+        '⌛ Bot agent ko jaldi transfer nahi karta',
+        '🙋‍♀️ Seedha human se baat karne ka option hona chahiye',
+        '🔁 Bar bar same baat dobara likhni parti hai',
+        '✍️ Aur koi wajah (please specify)'
+      ]
+    },
+    {
+      id: 'q1a_text',
+      type: 'text',
+      question: 'Kripya apni wajah 10 words mein likhein:',
+      maxWords: 10
+    },
+    {
+      id: 'q2',
+      type: 'multiple-choice',
+      question: 'Kya helpline per rabta karne se aapka issue resolve hota hai?',
+      options: [
+        '🟢 Haan, asaani se ho jata hai',
+        '🔁 Haan, lekin follow-up karna parta hai',
+        '❌ Nahi hota hai',
+        '📞 Bar bar contact karna parta hai'
+      ]
+    },
+    {
+      id: 'q2a',
+      type: 'multiple-choice',
+      question: 'Aap kis type ke maslay ke liye helpline aapki itni support nahi kar pati?',
+      options: [
+        '📦 Order ki delivery kay issues',
+        '🔄 Status update kay issues',
+        '💸 Return / Refunds kay issues',
+        '💰 Profit / Bonus kay issues',
+        '✍️ All Above'
+      ]
+    },
+    {
+      id: 'q2a1',
+      type: 'multiple-choice',
+      question: 'Delivery issue kis type ka tha?',
+      options: [
+        'Late delivery ho rahi thi',
+        'Courier se contact nahi ho pa raha tha',
+        'Delivery status galat dikh raha tha',
+        'Order lost ho gaya tha'
+      ]
+    },
+    {
+      id: 'q2a2',
+      type: 'multiple-choice',
+      question: 'Status issue kis jagah confuse kar raha tha?',
+      options: [
+        'App me "Delivered" likha tha lekin mila nahi',
+        '"Out for delivery" pe atka hua tha',
+        '"No update" dikh raha tha',
+        'Status bar samajh nahi aayi'
+      ]
+    },
+    {
+      id: 'q2a3',
+      type: 'multiple-choice',
+      question: 'Return ya refund me kya masla tha?',
+      options: [
+        'Refund delay ho gaya',
+        'Return request accept nahi hui',
+        'Parcel khud return karna para',
+        'Amount galat mila wapis'
+      ]
+    },
+    {
+      id: 'q2a4',
+      type: 'multiple-choice',
+      question: 'Profit ya bonus ka kya masla tha?',
+      options: [
+        'Profit amount kam mila',
+        'Bonus show nahi ho raha tha',
+        'Boht late profit mila tha',
+        'App per paid show ho raha tha but mila nahi'
+      ]
+    },
+    {
+      id: 'q3',
+      type: 'multiple-choice',
+      question: 'Support team ka lehja aur attitude kaisa hota hai?',
+      options: [
+        '🤝 Friendly aur helpful',
+        '🙂 Theek hai, lekin aur behtar ho sakta hai',
+        '😐 Rude ya uninterested lagta hai',
+        '🙅 Mujhe baat hi nahi hui support se'
+      ]
+    },
+    {
+      id: 'q3a',
+      type: 'multiple-choice',
+      question: 'Aapko kaisa laga unka attitude?',
+      options: [
+        '😤 Baat properly nahi sunte',
+        '🙄 Boring / uninterested tone hoti hai',
+        '⌛ Sirf auto replies milte rahte hain',
+        '💬 Bar bar agent change hota rahta hai',
+        '✍️ Koi aur reason? (please specify)'
+      ]
+    },
+    {
+      id: 'q3b',
+      type: 'multiple-choice',
+      question: 'Aapko Support team ke attitude main kya change chahiye?',
+      options: [
+        '🙋‍♂️ Zyada patience hona chahiye',
+        '📢 Clear aur direct jawab dena chahiye',
+        '💬 Personal touch hona chahiye — scripted nahi',
+        '✍️ Koi aur suggestion?'
+      ]
+    },
+    {
+      id: 'q4',
+      type: 'multiple-choice',
+      question: 'Kya aap in me se koi Markaz support tools use kar chuke hain?',
+      options: [
+        '🔁 Automatic reattempt request form',
+        '❌ Order cancellation form',
+        '🇨🇳 China parcels ka form',
+        '🚫 Nahi, in me se koi bhi use nahi kiya'
+      ]
+    },
+    {
+      id: 'q4a',
+      type: 'multiple-choice',
+      question: 'Kya reattempt form se aapka masla solve hua tha?',
+      options: [
+        '✅ Haan, easy tha aur kaam ho gaya',
+        '⚠️ Nahi, form fill kiya lekin koi response nahi aaya',
+        '🔁 Dubara try karna para',
+        '✍️ Koi aur masla'
+      ]
+    },
+    {
+      id: 'q4b',
+      type: 'multiple-choice',
+      question: 'Cancellation form fill karne ke baad kya hua?',
+      options: [
+        '✅ Order cancel ho gaya timely',
+        '🕒 Boht der lagi cancel hone me',
+        '🚫 Cancel nahi hua, support se contact karna para',
+        '✍️ Koi aur issue tha'
+      ]
+    },
+    {
+      id: 'q4c',
+      type: 'multiple-choice',
+      question: 'Aapko China parcel form samajh aaya tha?',
+      options: [
+        '✅ Haan, clear tha and issue resolve ho gaya',
+        '🤔 Samajhne me thoda mushkil tha',
+        '❓ Confusion hui ke form ka matlab kya hai',
+        '✍️ Suggestion dena chahte hain'
+      ]
+    },
+    {
+      id: 'q5',
+      type: 'group',
+      question: 'Markaz app ki 3 acchi aur 3 behtar banane wali cheezein likhein:',
+      fields: [
+        { type: 'text', label: '1. Achi cheez', required: true, maxWords: 10 },
+        { type: 'text', label: '2. Achi cheez', required: true, maxWords: 10 },
+        { type: 'text', label: '3. Achi cheez', required: true, maxWords: 10 },
+        { type: 'text', label: '1. Is cheez main behtari ki zarurat hai', required: true, maxWords: 10 },
+        { type: 'text', label: '2. Is cheez main behtari ki zarurat hai', required: true, maxWords: 10 },
+        { type: 'text', label: '3. Is cheez main behtari ki zarurat hai', required: true, maxWords: 10 }
+      ]
+    },
+    { id: 'thankyou', type: 'thankyou' }
+  ];
+
   const handleAnswer = (questionId: string, answer: string) => {
     setSurveyData(prev => ({ ...prev, [questionId]: answer }));
     
@@ -34,6 +227,9 @@ const Index = () => {
       'q1': {
         '🤔 Thoda mushkil': 'q1a',
         '😕 Samajh nahi aata kya karna hota hai': 'q1a'
+      },
+      'q1a': {
+        '✍️ Aur koi wajah (please specify)': 'q1a_text'
       },
       'q2': {
         '❌ Nahi hota hai': 'q2a',
@@ -77,12 +273,13 @@ const Index = () => {
   const handleSubmit = async () => {
     console.log('Survey Data:', surveyData);
 
-    // Prepare payload to match your Google Sheet columns
+    // Prepare payload to match Google Sheet columns
     const payload = {
       timestamp: new Date().toISOString(),
       resellerId: surveyData['resellerId'] || '',
       q1: surveyData['q1'] || '',
       q1a: surveyData['q1a'] || '',
+      q1a_text: surveyData['q1a_text'] || '',
       q2: surveyData['q2'] || '',
       q2a: surveyData['q2a'] || '',
       q2aX: surveyData['q2a1'] || surveyData['q2a2'] || surveyData['q2a3'] || surveyData['q2a4'] || '',
@@ -128,6 +325,11 @@ const Index = () => {
     }
   };
 
+  const validateWordCount = (value: string, maxWords: number = 10) => {
+    const words = value.trim().split(/\s+/).filter(word => word.length > 0);
+    return words.length <= maxWords;
+  };
+
   const WelcomePage = () => (
     <div className="text-center animate-fade-in">
       <div className="text-6xl mb-6">👋</div>
@@ -135,7 +337,7 @@ const Index = () => {
         Assalamualaikum Reseller Family!
       </h1>
       <div className="text-lg text-gray-600 mb-8 leading-relaxed space-y-4">
-        <p className="text-markaz-green font-medium">
+        <p className="text-primary font-medium">
           Aapka feedback humare liye bohat important hai 💚
         </p>
         <p>
@@ -150,7 +352,7 @@ const Index = () => {
       </div>
       <Button 
         onClick={() => setCurrentPage(1)}
-        className="bg-markaz-green hover:bg-markaz-green/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
       >
         Start Survey
       </Button>
@@ -167,10 +369,10 @@ const Index = () => {
           <Button
             key={index}
             variant="outline"
-            className="w-full h-16 p-4 text-left text-base leading-tight rounded-2xl border-2 hover:border-markaz-green hover:bg-markaz-light transition-all duration-200 justify-start items-center flex"
+            className="w-full h-16 p-4 text-left text-base leading-tight rounded-full border-2 hover:border-primary hover:bg-primary/5 transition-all duration-200 justify-start items-center flex transform hover:scale-[1.02] shadow-sm hover:shadow-md"
             onClick={() => handleAnswer(page.id, option)}
           >
-            <span className="truncate">{option}</span>
+            <span className="truncate text-sm sm:text-base">{option}</span>
           </Button>
         ))}
       </div>
@@ -178,9 +380,19 @@ const Index = () => {
   );
 
   const TextInputQuestion = ({ page }: { page: any }) => {
-    const validateWordCount = (value: string) => {
-      const words = value.split(' ').filter(word => word.length > 0);
-      return words.length <= (page.maxWords || 10);
+    const currentValue = surveyData[page.id] || '';
+    
+    const handleBlur = (value: string) => {
+      if (!validateWordCount(value, page.maxWords)) {
+        const words = value.trim().split(/\s+/).filter(word => word.length > 0);
+        const truncated = words.slice(0, page.maxWords).join(' ');
+        handleTextAnswer(page.id, truncated);
+        toast({
+          title: "Word limit exceeded",
+          description: `Text truncated to ${page.maxWords} words`,
+          variant: "destructive"
+        });
+      }
     };
 
     return (
@@ -191,27 +403,18 @@ const Index = () => {
         <div className="space-y-6">
           <Textarea
             placeholder="Aapka jawab yahan likhein..."
-            className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-markaz-green resize-none"
-            value={surveyData[page.id] || ''}
-            onChange={(e) => {
-              // Only validate on blur to prevent typing lag
-              handleTextAnswer(page.id, e.target.value);
-            }}
-            onBlur={(e) => {
-              if (!validateWordCount(e.target.value)) {
-                const words = e.target.value.split(' ').filter(word => word.length > 0);
-                const truncated = words.slice(0, page.maxWords || 10).join(' ');
-                handleTextAnswer(page.id, truncated);
-              }
-            }}
+            className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-primary resize-none"
+            value={currentValue}
+            onChange={(e) => handleTextAnswer(page.id, e.target.value)}
+            onBlur={(e) => handleBlur(e.target.value)}
           />
           <p className="text-sm text-gray-500 text-center">
-            {page.maxWords && `Maximum ${page.maxWords} words`}
+            Maximum {page.maxWords || 10} words
           </p>
           <Button 
             onClick={goToNextPage}
-            className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-            disabled={!surveyData[page.id]?.trim()}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            disabled={!currentValue.trim()}
           >
             Next
           </Button>
@@ -221,10 +424,22 @@ const Index = () => {
   };
 
   const GroupQuestion = ({ page }: { page: any }) => {
-    const validateWordCount = (value: string, maxWords: number) => {
-      const words = value.split(' ').filter(word => word.length > 0);
-      return words.length <= maxWords;
+    const handleBlur = (fieldIndex: number, value: string, maxWords: number) => {
+      if (!validateWordCount(value, maxWords)) {
+        const words = value.trim().split(/\s+/).filter(word => word.length > 0);
+        const truncated = words.slice(0, maxWords).join(' ');
+        handleTextAnswer(`${page.id}_${fieldIndex}`, truncated);
+        toast({
+          title: "Word limit exceeded",
+          description: `Text truncated to ${maxWords} words`,
+          variant: "destructive"
+        });
+      }
     };
+
+    const allFieldsFilled = page.fields.every((_: any, index: number) => 
+      surveyData[`${page.id}_${index}`]?.trim()
+    );
 
     return (
       <div className="animate-fade-in">
@@ -235,22 +450,14 @@ const Index = () => {
           {page.fields.map((field: any, index: number) => (
             <div key={index} className="space-y-2">
               <label className="text-lg font-medium text-gray-700">
-                {index < 3 ? field.label : field.label.replace('Behtar cheez', 'Is cheez main behtari ki zarurat hai')}
+                {field.label}
               </label>
               <Input
                 placeholder="Yahan likhein..."
-                className="text-lg p-4 rounded-2xl border-2 focus:border-markaz-green"
+                className="text-lg p-4 rounded-2xl border-2 focus:border-primary"
                 value={surveyData[`${page.id}_${index}`] || ''}
-                onChange={(e) => {
-                  handleTextAnswer(`${page.id}_${index}`, e.target.value);
-                }}
-                onBlur={(e) => {
-                  if (!validateWordCount(e.target.value, field.maxWords || 10)) {
-                    const words = e.target.value.split(' ').filter(word => word.length > 0);
-                    const truncated = words.slice(0, field.maxWords || 10).join(' ');
-                    handleTextAnswer(`${page.id}_${index}`, truncated);
-                  }
-                }}
+                onChange={(e) => handleTextAnswer(`${page.id}_${index}`, e.target.value)}
+                onBlur={(e) => handleBlur(index, e.target.value, field.maxWords || 10)}
               />
               <p className="text-sm text-gray-500">
                 Maximum {field.maxWords || 10} words
@@ -259,8 +466,8 @@ const Index = () => {
           ))}
           <Button 
             onClick={goToNextPage}
-            className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-            disabled={!page.fields.every((_: any, index: number) => surveyData[`${page.id}_${index}`]?.trim())}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            disabled={!allFieldsFilled}
           >
             Next
           </Button>
@@ -272,18 +479,18 @@ const Index = () => {
   const ThankYouPage = () => (
     <div className="text-center animate-fade-in">
       <div className="text-6xl mb-6">🎉</div>
-      <h1 className="text-3xl font-bold text-markaz-green mb-6">
+      <h1 className="text-3xl font-bold text-primary mb-6">
         Shukriya!
       </h1>
       <div className="text-lg text-gray-600 mb-8 leading-relaxed space-y-4">
-        <p className="text-markaz-green font-medium">
+        <p className="text-primary font-medium">
           Aapka feedback humare liye bohat valuable hai 💚
         </p>
         <p>
-          Aapki baat support aur product team tak pohchayi jaayegi — taake Markaz ko aur behtar banaya jaa sake.
+          Aapka feedback support aur product team tak pohch gaya hai. Future mein aap improvements dekhenge.
         </p>
         <p className="font-medium">
-          Aap ki participation ka shukriya, is process se aap future main mazeed improvements dekhien ge💪
+          Aap ki participation ka shukriya! 💪
         </p>
       </div>
       <Button 
@@ -291,205 +498,30 @@ const Index = () => {
           setCurrentPage(0);
           setSurveyData({});
         }}
-        className="bg-markaz-green hover:bg-markaz-green/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
       >
-        Submit & Close
+        Restart Survey
       </Button>
     </div>
   );
 
-  // Define all pages
-  const pages = [
-    { id: 'welcome', type: 'welcome' },
-    {
-      id: 'q1',
-      type: 'multiple-choice',
-      question: 'Support team se baat karna aapko kaisa lagta?',
-      options: [
-        '✅ Asaan',
-        '🙂 Theek tha',
-        '🤔 Thoda mushkil',
-        '😕 Samajh nahi aata kya karna hota hai'
-      ]
-    },
-    {
-      id: 'q1a',
-      type: 'multiple-choice',
-      question: 'Aapko kis cheez me sabse zyada mushkil hui?',
-      options: [
-        '🤖 Bot ka jawab sahi nahi hota',
-        '⌛ Bot agent ko jaldi transfer nahi karta',
-        '🙋‍♀️ Seedha human se baat karne ka option hona chahiye',
-        '🔁 Bar bar same baat dobara likhni parti hai',
-        '✍️ Aur koi wajah (please specify)'
-      ]
-    },
-    {
-      id: 'q2',
-      type: 'multiple-choice',
-      question: 'Kia helpline per rabta krne se apka issue resolve hota hai?',
-      options: [
-        '🟢 Haan, asaani se ho jata hai',
-        '🔁 Haan, lekin follow-up karna parta hai',
-        '❌ Nahi hota hai',
-        '📞 Bar bar contact karna parta hai'
-      ]
-    },
-    {
-      id: 'q2a',
-      type: 'multiple-choice',
-      question: 'Aap kis type ke maslay ke liaye helpline apki itni support nahi kar pati?',
-      options: [
-        '📦 Order ki delivery kay issues',
-        '🔄 Status update kay issues',
-        '💸 Return / Refunds kay issues',
-        '💰 Profit / Bonus kay issues',
-        '✍️ All Above'
-      ]
-    },
-    {
-      id: 'q2a1',
-      type: 'multiple-choice',
-      question: 'Delivery issue kis type ka tha?',
-      options: [
-        'Late delivery ho rahi thi',
-        'Courier se contact nahi ho pa raha tha',
-        'Delivery status galat dikh raha tha',
-        'Order lost ho gaya tha'
-      ]
-    },
-    {
-      id: 'q2a2',
-      type: 'multiple-choice',
-      question: 'Status issue kis jagah confuse kar raha tha?',
-      options: [
-        'App me "Delivered" likha tha lekin mila nahi',
-        '"Out for delivery" pe atka hua tha',
-        '"No update" dikh raha tha',
-        'Status bar samajh nahi aayi'
-      ]
-    },
-    {
-      id: 'q2a3',
-      type: 'multiple-choice',
-      question: 'Return ya refund me kya masla tha?',
-      options: [
-        'Refund delay ho gaya',
-        'Return request accept nahi hui',
-        'Parcel khud return krna para',
-        'Amount galat mila wapis'
-      ]
-    },
-    {
-      id: 'q2a4',
-      type: 'multiple-choice',
-      question: 'Profit ya bonus ka kya masla tha?',
-      options: [
-        'Profit amount kam mila',
-        'Bonus show nahi ho raha tha',
-        'Boht late profit mila tha',
-        'App per paid show ho raha tha but mila nahi'
-      ]
-    },
-    {
-      id: 'q3',
-      type: 'multiple-choice',
-      question: 'Support team ka lehja aur attitude kaisa hota hai?',
-      options: [
-        '🤝 Friendly aur helpful',
-        '🙂 Theek hai, lekin aur behtar ho sakta hai',
-        '😐 Rude ya uninterested lagta hai',
-        '🙅 Mujhe baat hi nahi hui support se'
-      ]
-    },
-    {
-      id: 'q3a',
-      type: 'multiple-choice',
-      question: 'Aapko kaisa laga unka attitude?',
-      options: [
-        '😤 Baat properly nahi sunte',
-        '🙄 Boring / uninterested tone hoti hai',
-        '⌛ Sirf auto replies milte rahte hain',
-        '💬 Bar bar agent change hota rahta hai',
-        '✍️ Koi aur reason? (please specify)'
-      ]
-    },
-    {
-      id: 'q3b',
-      type: 'multiple-choice',
-      question: 'Apko Support team ke attitude main kia change chahye?',
-      options: [
-        '🙋‍♂️ Zyada patience hona chahiye',
-        '📢 Clear aur direct jawab dena chahiye',
-        '💬 Personal touch hona chahye — scripted nahi',
-        '✍️ Koi aur suggestion?'
-      ]
-    },
-    {
-      id: 'q4',
-      type: 'multiple-choice',
-      question: 'Kya aap in me se koi Markaz support tools use kar chuke hain?',
-      options: [
-        '🔁 Automatic reattempt request form',
-        '❌ Order cancellation form',
-        '🇨🇳 China parcels ka form',
-        '🚫 Nahi, in me se koi bhi use nahi kiya'
-      ]
-    },
-    {
-      id: 'q4a',
-      type: 'multiple-choice',
-      question: 'Kya reattempt form se aapka masla solve hua tha?',
-      options: [
-        '✅ Haan, easy tha aur kaam ho gaya',
-        '⚠️ Nahi, form fill kia lekin koi response nahi aaya',
-        '🔁 Dubara try karna para',
-        '✍️ Koi aur masla'
-      ]
-    },
-    {
-      id: 'q4b',
-      type: 'multiple-choice',
-      question: 'Cancellation form fill krne ke baad kya hua?',
-      options: [
-        '✅ Order cancel ho gaya timely',
-        '🕒 Bhot der lagi cancel hone me',
-        '🚫 Cancel nahi hua, support se contact karna para',
-        '✍️ Koi aur issue tha'
-      ]
-    },
-    {
-      id: 'q4c',
-      type: 'multiple-choice',
-      question: 'Aapko China parcel form samajh aaya tha?',
-      options: [
-        '✅ Haan, clear tha and issue resolve ho gya',
-        '🤔 Samajhne me thoda mushkil tha',
-        '❓ Confusion hui ke form ka matlab kya hai',
-        '✍️ Suggestion dena chahte hain'
-      ]
-    },
-    {
-      id: 'q5',
-      type: 'group',
-      question: 'Markaz app ki 3 acchi aur 3 behtar banane wali cheezein likhein:',
-      fields: [
-        { type: 'text', label: '1. Achi cheez', required: true, maxWords: 10 },
-        { type: 'text', label: '2. Achi cheez', required: true, maxWords: 10 },
-        { type: 'text', label: '3. Achi cheez', required: true, maxWords: 10 },
-        { type: 'text', label: '1. Behtar cheez', required: true, maxWords: 10 },
-        { type: 'text', label: '2. Behtar cheez', required: true, maxWords: 10 },
-        { type: 'text', label: '3. Behtar cheez', required: true, maxWords: 10 }
-      ]
-    },
-    { id: 'thankyou', type: 'thankyou' }
-  ];
-
   const renderCurrentPage = () => {
     if (currentPage === 0) return <WelcomePage />;
-    if (currentPage >= pages.length) return <ThankYouPage />;
+    if (currentPage >= pages.length) {
+      // Fallback to thank you page if somehow we exceed bounds
+      const thankYouIndex = pages.findIndex(p => p.id === 'thankyou');
+      if (thankYouIndex !== -1) {
+        setCurrentPage(thankYouIndex);
+        return <ThankYouPage />;
+      }
+      return <ThankYouPage />;
+    }
     
     const page = pages[currentPage];
+    
+    if (!page) {
+      return <ThankYouPage />;
+    }
     
     switch (page.type) {
       case 'multiple-choice':
@@ -498,6 +530,8 @@ const Index = () => {
         return <TextInputQuestion page={page} />;
       case 'group':
         return <GroupQuestion page={page} />;
+      case 'thankyou':
+        return <ThankYouPage />;
       default:
         return <div>Unknown page type</div>;
     }
@@ -509,6 +543,8 @@ const Index = () => {
 
   const getCurrentQuestionNumber = () => {
     if (currentPage === 0 || currentPage >= pages.length) return 0;
+    const page = pages[currentPage];
+    if (page?.type === 'thankyou') return getTotalQuestions();
     return Math.min(currentPage, getTotalQuestions());
   };
 
@@ -516,7 +552,7 @@ const Index = () => {
     <div className="min-h-screen bg-white font-inter">
       <div className="container max-w-md mx-auto px-4 py-8">
         {/* Progress Bar */}
-        {currentPage > 0 && currentPage < pages.length && (
+        {currentPage > 0 && pages[currentPage]?.type !== 'thankyou' && (
           <div className="mb-8">
             <div className="flex justify-between text-sm text-gray-500 mb-2">
               <span>Question {getCurrentQuestionNumber()} of {getTotalQuestions()}</span>
@@ -524,7 +560,7 @@ const Index = () => {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
-                className="bg-markaz-green h-2 rounded-full transition-all duration-500 ease-out"
+                className="bg-primary h-2 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${(getCurrentQuestionNumber() / getTotalQuestions()) * 100}%` }}
               ></div>
             </div>
@@ -537,11 +573,11 @@ const Index = () => {
         </Card>
 
         {/* Back Button */}
-        {currentPage > 1 && currentPage < pages.length && (
+        {currentPage > 1 && pages[currentPage]?.type !== 'thankyou' && (
           <Button
             variant="ghost"
             onClick={() => setCurrentPage(currentPage - 1)}
-            className="mt-6 text-gray-500 hover:text-markaz-green"
+            className="mt-6 text-gray-500 hover:text-primary rounded-full"
           >
             ← Back
           </Button>
