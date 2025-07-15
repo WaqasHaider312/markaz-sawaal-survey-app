@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -73,7 +74,6 @@ const Index = () => {
     }
   };
 
-  // Replace the old handleSubmit with the new async version
   const handleSubmit = async () => {
     console.log('Survey Data:', surveyData);
 
@@ -115,7 +115,9 @@ const Index = () => {
         description: "Aapka feedback successfully submit ho gaya hai.",
       });
 
-      setCurrentPage(pages.length); // Show thank you page
+      // Fixed: Navigate to thank you page properly
+      const thankYouPageIndex = pages.findIndex(p => p.id === 'thankyou');
+      setCurrentPage(thankYouPageIndex);
 
     } catch (error) {
       console.error("❌ Error saving to Sheet:", error);
@@ -175,74 +177,97 @@ const Index = () => {
     </div>
   );
 
-  const TextInputQuestion = ({ page }: { page: any }) => (
-    <div className="animate-fade-in">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-        {page.question}
-      </h2>
-      <div className="space-y-6">
-        <Textarea
-          placeholder="Aapka jawab yahan likhein..."
-          className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-markaz-green resize-none"
-          value={surveyData[page.id] || ''}
-          onChange={(e) => {
-            const words = e.target.value.split(' ').filter(word => word.length > 0);
-            if (words.length <= (page.maxWords || 50)) {
-              handleTextAnswer(page.id, e.target.value);
-            }
-          }}
-        />
-        <p className="text-sm text-gray-500 text-center">
-          {page.maxWords && `Maximum ${page.maxWords} words`}
-        </p>
-        <Button 
-          onClick={goToNextPage}
-          className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          disabled={!surveyData[page.id]?.trim()}
-        >
-          Next
-        </Button>
-      </div>
-    </div>
-  );
+  const TextInputQuestion = ({ page }: { page: any }) => {
+    const validateWordCount = (value: string) => {
+      const words = value.split(' ').filter(word => word.length > 0);
+      return words.length <= (page.maxWords || 10);
+    };
 
-  const GroupQuestion = ({ page }: { page: any }) => (
-    <div className="animate-fade-in">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-        {page.question}
-      </h2>
-      <div className="space-y-6">
-        {page.fields.map((field: any, index: number) => (
-          <div key={index} className="space-y-2">
-            <label className="text-lg font-medium text-gray-700">
-              {index < 3 ? field.label : field.label.replace('Behtar cheez', 'Is cheez main behtari ki zarurat hai')}
-            </label>
-            <Input
-              placeholder="Yahan likhein..."
-              className="text-lg p-4 rounded-2xl border-2 focus:border-markaz-green"
-              value={surveyData[`${page.id}_${index}`] || ''}
-              onChange={(e) => {
+    return (
+      <div className="animate-fade-in">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          {page.question}
+        </h2>
+        <div className="space-y-6">
+          <Textarea
+            placeholder="Aapka jawab yahan likhein..."
+            className="min-h-[120px] text-lg p-4 rounded-2xl border-2 focus:border-markaz-green resize-none"
+            value={surveyData[page.id] || ''}
+            onChange={(e) => {
+              // Only validate on blur to prevent typing lag
+              handleTextAnswer(page.id, e.target.value);
+            }}
+            onBlur={(e) => {
+              if (!validateWordCount(e.target.value)) {
                 const words = e.target.value.split(' ').filter(word => word.length > 0);
-                if (words.length <= (field.maxWords || 10)) {
-                  handleTextAnswer(`${page.id}_${index}`, e.target.value);
-                }
-              }}
-            />
-            <p className="text-sm text-gray-500">
-              Maximum {field.maxWords || 10} words
-            </p>
-          </div>
-        ))}
-        <Button 
-          onClick={goToNextPage}
-          className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          disabled={!page.fields.every((_: any, index: number) => surveyData[`${page.id}_${index}`]?.trim())}
-        >
-          Next
-        </Button>
+                const truncated = words.slice(0, page.maxWords || 10).join(' ');
+                handleTextAnswer(page.id, truncated);
+              }
+            }}
+          />
+          <p className="text-sm text-gray-500 text-center">
+            {page.maxWords && `Maximum ${page.maxWords} words`}
+          </p>
+          <Button 
+            onClick={goToNextPage}
+            className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            disabled={!surveyData[page.id]?.trim()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const GroupQuestion = ({ page }: { page: any }) => {
+    const validateWordCount = (value: string, maxWords: number) => {
+      const words = value.split(' ').filter(word => word.length > 0);
+      return words.length <= maxWords;
+    };
+
+    return (
+      <div className="animate-fade-in">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          {page.question}
+        </h2>
+        <div className="space-y-6">
+          {page.fields.map((field: any, index: number) => (
+            <div key={index} className="space-y-2">
+              <label className="text-lg font-medium text-gray-700">
+                {index < 3 ? field.label : field.label.replace('Behtar cheez', 'Is cheez main behtari ki zarurat hai')}
+              </label>
+              <Input
+                placeholder="Yahan likhein..."
+                className="text-lg p-4 rounded-2xl border-2 focus:border-markaz-green"
+                value={surveyData[`${page.id}_${index}`] || ''}
+                onChange={(e) => {
+                  handleTextAnswer(`${page.id}_${index}`, e.target.value);
+                }}
+                onBlur={(e) => {
+                  if (!validateWordCount(e.target.value, field.maxWords || 10)) {
+                    const words = e.target.value.split(' ').filter(word => word.length > 0);
+                    const truncated = words.slice(0, field.maxWords || 10).join(' ');
+                    handleTextAnswer(`${page.id}_${index}`, truncated);
+                  }
+                }}
+              />
+              <p className="text-sm text-gray-500">
+                Maximum {field.maxWords || 10} words
+              </p>
+            </div>
+          ))}
+          <Button 
+            onClick={goToNextPage}
+            className="w-full bg-markaz-green hover:bg-markaz-green/90 text-white py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            disabled={!page.fields.every((_: any, index: number) => surveyData[`${page.id}_${index}`]?.trim())}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   const ThankYouPage = () => (
     <div className="text-center animate-fade-in">
