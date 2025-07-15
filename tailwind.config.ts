@@ -26,7 +26,7 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#18A558',
+					DEFAULT: '#10b981',
 					foreground: '#ffffff'
 				},
 				secondary: {
@@ -64,12 +64,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				markaz: {
-					green: '#18A558',
-					light: '#f8fffe'
+					green: '#10b981',
+					light: '#f3f4f6'
 				}
 			},
 			fontFamily: {
-				'nunito': ['Nunito', 'sans-serif'],
+				'inter': ['Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
