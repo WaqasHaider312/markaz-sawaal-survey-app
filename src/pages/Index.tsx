@@ -73,13 +73,57 @@ const Index = () => {
     }
   };
 
-  const handleSubmit = () => {
+  // Replace the old handleSubmit with the new async version
+  const handleSubmit = async () => {
     console.log('Survey Data:', surveyData);
-    toast({
-      title: "🎉 Shukriya!",
-      description: "Aapka feedback successfully submit ho gaya hai.",
-    });
-    setCurrentPage(pages.length); // Go to thank you page
+
+    // Prepare payload to match your Google Sheet columns
+    const payload = {
+      timestamp: new Date().toISOString(),
+      resellerId: surveyData['resellerId'] || '',
+      q1: surveyData['q1'] || '',
+      q1a: surveyData['q1a'] || '',
+      q2: surveyData['q2'] || '',
+      q2a: surveyData['q2a'] || '',
+      q2aX: surveyData['q2a1'] || surveyData['q2a2'] || surveyData['q2a3'] || surveyData['q2a4'] || '',
+      q3: surveyData['q3'] || '',
+      q3ab: surveyData['q3a'] || surveyData['q3b'] || '',
+      q4: surveyData['q4'] || '',
+      q4abc: surveyData['q4a'] || surveyData['q4b'] || surveyData['q4c'] || '',
+      good1: surveyData['q5_0'] || '',
+      good2: surveyData['q5_1'] || '',
+      good3: surveyData['q5_2'] || '',
+      bad1: surveyData['q5_3'] || '',
+      bad2: surveyData['q5_4'] || '',
+      bad3: surveyData['q5_5'] || ''
+    };
+
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycby8KytAlTHdmHkCxbF-96piMleodvinERMk3RRuukPxWd_fwwV3zNP7ex7bKO0r3LKUcg/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      console.log("✅ Google Sheet response:", result);
+
+      toast({
+        title: "🎉 Shukriya!",
+        description: "Aapka feedback successfully submit ho gaya hai.",
+      });
+
+      setCurrentPage(pages.length); // Show thank you page
+
+    } catch (error) {
+      console.error("❌ Error saving to Sheet:", error);
+      toast({
+        title: "⚠️ Error",
+        description: "Feedback submit nahi ho paaya. Dobara try karein.",
+      });
+    }
   };
 
   const WelcomePage = () => (
