@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -122,10 +121,10 @@ const Index = () => {
           <Button
             key={index}
             variant="outline"
-            className="w-full p-6 text-left text-lg rounded-2xl border-2 hover:border-markaz-green hover:bg-markaz-light transition-all duration-200 justify-start"
+            className="w-full h-16 p-4 text-left text-base leading-tight rounded-2xl border-2 hover:border-markaz-green hover:bg-markaz-light transition-all duration-200 justify-start items-center flex"
             onClick={() => handleAnswer(page.id, option)}
           >
-            {option}
+            <span className="truncate">{option}</span>
           </Button>
         ))}
       </div>
@@ -172,7 +171,7 @@ const Index = () => {
         {page.fields.map((field: any, index: number) => (
           <div key={index} className="space-y-2">
             <label className="text-lg font-medium text-gray-700">
-              {field.label}
+              {index < 3 ? field.label : field.label.replace('Behtar cheez', 'Is cheez main behtari ki zarurat hai')}
             </label>
             <Input
               placeholder="Yahan likhein..."
